@@ -2,7 +2,7 @@ const tableBody = document.querySelector("#odontologosTable tbody");
 const apiURL = "http://localhost:8080";
 
 function fetchOdontologos() {
-  fetch(`${apiURL}/odontologo`)
+  fetch(`/odontologo`)
     .then(response => response.json())
     .then(data => {
       console.log(data);
@@ -43,7 +43,7 @@ document.getElementById("editForm").addEventListener("submit", function(event) {
   const apellido = document.getElementById("editApellido").value;
   const matricula = document.getElementById("editMatricula").value;
 
-  fetch(`${apiURL}/odontologo/${id}`, {
+  fetch(`/odontologo/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -64,7 +64,7 @@ document.getElementById("editForm").addEventListener("submit", function(event) {
 
 function deleteOdontologo(id) {
   if (confirm("¿Estás seguro de que deseas eliminar este odontólogo?")) {
-    fetch(`${apiURL}/odontologo/${id}`, {
+    fetch(`/odontologo/${id}`, {
       method: "DELETE",
     })
       .then(response => response.json())

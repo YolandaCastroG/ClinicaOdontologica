@@ -1,5 +1,4 @@
 const form = document.getElementById("agregarForm");
-const apiURL = "http://localhost:8080";
 
 form.addEventListener("submit", function (event) {
   event.preventDefault();
@@ -10,7 +9,7 @@ form.addEventListener("submit", function (event) {
 
   // llamando al endpoint de agregar
 
-  fetch(`${apiURL}/odontologo`, {
+  fetch(`/odontologo`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
