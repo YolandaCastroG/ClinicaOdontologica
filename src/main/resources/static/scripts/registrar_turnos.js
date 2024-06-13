@@ -69,6 +69,7 @@
     })();
 });*/
 
+/*
 const form = document.querySelector('#add_new_turno');
 
 form.addEventListener('submit', function (event) {
@@ -121,3 +122,4 @@ const resetUploadForm = () => {
     document.querySelector('.nav .nav-item a:last-child').classList.add('active');
   }
 })();
+*/
