@@ -52,21 +52,25 @@
     </nav>
     <div class="container">
         <h1 class="mt-5">Registrar Odontólogos</h1>
-        <form id="agregarForm" novalidate>
+        <form id="agregarForm">
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" required />
+                <input type="text" class="form-control" id="nombre" 
+                placeholder="Ingresa el nombre" required/>
             </div>
             <div class="mb-3">
                 <label for="apellido" class="form-label">Apellido</label>
-                <input type="text" class="form-control" id="apellido" required />
+                <input type="text" class="form-control" id="apellido"
+                placeholder="Ingresa el apellido" required />
             </div>
             <div class="mb-3">
                 <label for="matricula" class="form-label">Matrícula</label>
-                <input type="text" class="form-control" id="matricula" required />
+                <input type="text" class="form-control" id="matricula"
+                placeholder="Ingresa el número de matricula" required />
             </div>
-            <button type="submit" class="btn btn-primary">Agregar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
+        
     </div>
     <script src="./scripts/registrar_odontologos.js"></script>
 </header>

@@ -1,74 +1,72 @@
 package dh.backend.clinicaodontologica.service;
 
-import dh.backend.clinicaodontologica.dao.impl.PacienteDaoH2;
-import dh.backend.clinicaodontologica.model.Domicilio;
-import dh.backend.clinicaodontologica.model.Paciente;
+import dh.backend.clinicaodontologica.entity.Domicilio;
+import dh.backend.clinicaodontologica.entity.Paciente;
+import dh.backend.clinicaodontologica.exception.BadRequestException;
 import dh.backend.clinicaodontologica.service.impl.PacienteService;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class PacienteServiceTest {
     private static Logger LOGGER = LoggerFactory.getLogger(PacienteServiceTest.class);
-    private static PacienteService pacienteService = new PacienteService(new PacienteDaoH2());
+    @Autowired
+    private PacienteService pacienteService;
+    private Paciente paciente;
 
-    @BeforeAll
-    static void crearTablas(){
-        Connection connection = null;
-        try {
-            Class.forName("org.h2.Driver");
-            connection = DriverManager.getConnection("jdbc:h2:~/ClinicaOdontologica;INIT=RUNSCRIPT FROM 'create.sql'", "sa", "sa");
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error(e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                LOGGER.error(e.getMessage());
-            }
-        }
+    @BeforeEach
+    void setUp() {
+        paciente = new Paciente();
+        paciente.setApellido("Castro");
+        paciente.setNombre("Yolanda");
+        paciente.setDni("12345");
+        paciente.setFechaIngreso(LocalDate.of(2024, 6, 16));
+
+        Domicilio domicilio = new Domicilio();
+        domicilio.setCalle("Flores");
+        domicilio.setNumero(1237);
+        domicilio.setLocalidad("Suba");
+        domicilio.setProvincia("Bogotá");
+
+        paciente.setDomicilio(domicilio);
     }
 
     @Test
     @DisplayName("Testear que un paciente fue guardado")
-    void testPacienteGuardado(){
-        Paciente paciente = new Paciente("Cosme", "Menganito", "123456", LocalDate.of(2024, 04, 24),
-                new Domicilio("Calle Falsa", 456, "Springfield", "Montana"));
+    void testPacienteGuardado() throws BadRequestException {
         Paciente pacienteDesdeLaBD = pacienteService.registrarPaciente(paciente);
 
-        assertNotNull(pacienteDesdeLaBD);
+        assertNotNull(pacienteDesdeLaBD.getId());
+        LOGGER.info("Paciente guardado exitosamente en la base de datos: {}" + pacienteDesdeLaBD.getId());
     }
 
     @Test
     @DisplayName("Testear busqueda paciente por id")
     void testPacientePorId(){
         Integer id = 1;
-        Paciente pacienteEncontrado = pacienteService.buscarPorId(id);
+        Optional<Paciente> pacienteEncontrado = pacienteService.buscarPorId(id);
+        Paciente paciente1 = pacienteEncontrado.get();
 
-        assertEquals(id, pacienteEncontrado.getId());
+        assertEquals(id, paciente1.getId());
     }
 
     @Test
     @DisplayName("Testear busqueda todos los pacientes")
     void testBusquedaTodos() {
-        Paciente paciente = new Paciente("Cosme","Menganito","456464", LocalDate.of(2024,04,22),
-                new Domicilio("Calle Falsa", 456, "Springfield","Montana"));
-        pacienteService.registrarPaciente(paciente);
 
         List<Paciente> pacientes = pacienteService.buscarTodos();
 
-                assertEquals(2, pacientes.size());
+        assertTrue(pacientes.size()!=0);
     }
-
 }

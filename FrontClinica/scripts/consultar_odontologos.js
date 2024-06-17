@@ -1,15 +1,20 @@
 const tableBody = document.querySelector("#odontologosTable tbody");
 const apiURL = "http://localhost:8080";
 
+// listando los odontologos
 function fetchOdontologos() {
   fetch(`${apiURL}/odontologo`)
     .then(response => response.json())
     .then(data => {
       console.log(data);
+
+      // Limpiar el contenido actual de la tabla
       tableBody.innerHTML = "";
 
+      // Insertar los datos en la tabla
       data.forEach((odontologo, index) => {
         const row = document.createElement("tr");
+
         row.innerHTML = `
           <td>${index + 1}</td>
           <td>${odontologo.nombre}</td>
@@ -43,12 +48,12 @@ document.getElementById("editForm").addEventListener("submit", function(event) {
   const apellido = document.getElementById("editApellido").value;
   const matricula = document.getElementById("editMatricula").value;
 
-  fetch(`${apiURL}/odontologo/${id}`, {
+  fetch(`${apiURL}/odontologo`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ nombre, apellido, matricula }),
+    body: JSON.stringify({ id, nombre, apellido, matricula }),
   })
     .then(response => response.json())
     .then(data => {

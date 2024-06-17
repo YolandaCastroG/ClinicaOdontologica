@@ -1,30 +1,32 @@
 package dh.backend.clinicaodontologica.controller;
 
-import dh.backend.clinicaodontologica.model.Paciente;
+import dh.backend.clinicaodontologica.entity.Paciente;
+import dh.backend.clinicaodontologica.exception.BadRequestException;
+import dh.backend.clinicaodontologica.exception.ResourceNotFoundException;
 import dh.backend.clinicaodontologica.service.IPacienteService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/paciente")
 public class PacienteController {
-    public IPacienteService pacienteService;
+    private static Logger LOGGER = LoggerFactory.getLogger(PacienteController.class);
+    private IPacienteService pacienteService;
 
     public PacienteController(IPacienteService pacienteService) {
         this.pacienteService = pacienteService;
     }
 
     @PostMapping
-    public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente){
+    public ResponseEntity<Paciente> registrarPaciente(@RequestBody Paciente paciente) throws BadRequestException {
         Paciente pacienteARetornar = pacienteService.registrarPaciente(paciente);
-        if(pacienteARetornar == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(pacienteARetornar);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteARetornar);
     }
 
     @GetMapping
@@ -33,10 +35,10 @@ public class PacienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Paciente> buscarPacientePorID(@PathVariable Integer id){
-        Paciente paciente = pacienteService.buscarPorId(id);
-        if(paciente != null){
-            return ResponseEntity.ok(paciente);
+    public ResponseEntity<Paciente> buscarPacientePorId(@PathVariable Integer id){
+        Optional<Paciente> paciente = pacienteService.buscarPorId(id);
+        if(paciente.isPresent()){
+            return ResponseEntity.ok(paciente.get());
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
@@ -45,12 +47,32 @@ public class PacienteController {
     @PutMapping
     public ResponseEntity<String> actualizarPaciente(@RequestBody Paciente paciente){
         pacienteService.actualizarPaciente(paciente);
-        return ResponseEntity.ok("Paciente actualizado");
+        return ResponseEntity.ok("{\"message\": \"Paciente modificado\"}");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> borrarPaciente(@PathVariable Integer id){
+    public ResponseEntity<String> borrarPaciente(@PathVariable Integer id) throws ResourceNotFoundException {
         pacienteService.eliminarPaciente(id);
-        return ResponseEntity.ok("Paciente eliminado");
+        return ResponseEntity.ok("{\"message\": \"Paciente eliminado\"}");
+    }
+
+     @GetMapping("/dni/{dni}")
+    public ResponseEntity<List<Paciente>> buscarPacientePorDni(@PathVariable String dni) {
+        List<Paciente> listaPacientes = pacienteService.buscarPorDni(dni);
+        if(listaPacientes.size() > 0){
+            return ResponseEntity.ok(listaPacientes);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/provincia/{provincia}")
+    public ResponseEntity<List<Paciente>> buscarPacientePorProvincia(@PathVariable String provincia) {
+        List<Paciente> listadoPacientes = pacienteService.buscarPorProvincia(provincia);
+        if(listadoPacientes.size() > 0){
+            return ResponseEntity.ok(listadoPacientes);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

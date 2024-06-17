@@ -6,7 +6,7 @@ body {
     background-position: center;
     background-size: cover;
     /* capa sobre fondo */
-    box-shadow: inset 0 0 0 1000px rgba(135, 205, 238, 0.6);
+    box-shadow: inset 0 0 0 1000px rgba(11, 40, 53, 0.6);
 
 }
 
@@ -56,7 +56,7 @@ form {
     margin-bottom: 1rem;
 }
 
-.form-header h2 {
+.form-header h3 {
     margin-bottom: .8rem;
 }
 

@@ -1,12 +1,17 @@
 package dh.backend.clinicaodontologica.controller;
 
+import dh.backend.clinicaodontologica.dto.request.TurnoModificacionDto;
 import dh.backend.clinicaodontologica.dto.request.TurnoRequestDto;
 import dh.backend.clinicaodontologica.dto.response.TurnoResponseDto;
+import dh.backend.clinicaodontologica.exception.BadRequestException;
+import dh.backend.clinicaodontologica.exception.ResourceNotFoundException;
 import dh.backend.clinicaodontologica.service.ITurnoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -19,13 +24,9 @@ public class TurnoController {
     }
 
     @PostMapping
-    public ResponseEntity<TurnoResponseDto> agregarTurno(@RequestBody TurnoRequestDto turno) {
+    public ResponseEntity<TurnoResponseDto> agregarTurno(@RequestBody TurnoRequestDto turno) throws BadRequestException, ResourceNotFoundException {
         TurnoResponseDto turnoADevolver = turnoService.registrar(turno);
-        if (turnoADevolver == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } else {
-            return ResponseEntity.status(HttpStatus.CREATED).body(turnoADevolver);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(turnoADevolver);
     }
 
     @GetMapping
@@ -34,7 +35,7 @@ public class TurnoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TurnoResponseDto> buscarTurnoPorId(@PathVariable Integer id) {
+    public ResponseEntity<TurnoResponseDto> buscarTurnoPorId(@PathVariable Integer id){
         TurnoResponseDto turno = turnoService.buscarPorId(id);
         if (turno != null) {
             return ResponseEntity.ok(turno);
@@ -43,15 +44,31 @@ public class TurnoController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> modificarTurno(@PathVariable Integer id, @RequestBody TurnoRequestDto turno) {
-        turnoService.actualizarTurno(id, turno);
-        return ResponseEntity.ok("Turno modificado");
+    @PutMapping
+    public ResponseEntity<String> actualizarTurno(@RequestBody TurnoModificacionDto turno) throws ResourceNotFoundException {
+        turnoService.actualizarTurno(turno);
+        return ResponseEntity.ok("{\"message\": \"Turno modificado\"}");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> borrarTurno(@PathVariable Integer id) {
+    public ResponseEntity<String> borrarTurno(@PathVariable Integer id) throws ResourceNotFoundException {
         turnoService.eliminarTurno(id);
-        return ResponseEntity.ok("Turno eliminado");
+        return ResponseEntity.ok("{\"message\": \"Turno eliminado\"}");
     }
+
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @GetMapping("/fechas")
+    public ResponseEntity<List<TurnoResponseDto>> buscarEntreFechas(@RequestParam String inicio, @RequestParam String fin){
+        LocalDate fechaInicio = LocalDate.parse(inicio, formatter);
+        LocalDate fechaFinal = LocalDate.parse(fin, formatter);
+
+        return ResponseEntity.ok(turnoService.buscarTurnoEntreFechas(fechaInicio, fechaFinal));
+    }
+
+    @GetMapping("/posteriores")
+    public ResponseEntity<List<TurnoResponseDto>> listarTurnosPosterioresAFechaActual() {
+        return ResponseEntity.ok(turnoService.listarTurnosPosterioresAFechaActual());
+    }
+
 }
